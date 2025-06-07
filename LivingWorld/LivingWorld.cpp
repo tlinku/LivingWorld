@@ -31,10 +31,10 @@ int main()
 	//cout << org1.toString() << endl;
 
 	// Plant & Animal
-	Plant plant{ 3, p3 };
-	Animal animal{ 5, p2 };
-	Plant plant2;
-	Animal animal2;
+	Plant plant{ 3, p3, {}, 0, 0 };
+	Animal animal{ 5, p2, {}, 0, 0 };
+	Plant plant2{ 0, Position(0,0), {}, 0, 0 };
+	Animal animal2{ 0, Position(0,0), {}, 0, 0 };
 
 	cout << plant.toString() << endl;
 	cout << animal.toString() << endl;
@@ -50,12 +50,12 @@ int main()
 	Position posP1{ 4, 5 };
 	Plant plantW1{ 3, posP1 };
 	Position posP2{ 5, 4 };
-	Plant plantW2{ 3, posP2 };
+	Plant plantW2{ 3, posP2};
 
 	Position posW2{ 3, 2 };
-	Animal animalW1{ 6, posW2 };
+	Animal animalW1{ 6, posW2, {}, 0, 0 };
 	Position posW3{ 2, 3 };
-	Animal animalW2{ 6, posW3 };
+	Animal animalW2{ 6, posW3, {}, 0, 0 };
 
 	world.addOrganism(&plantW1);
 	world.addOrganism(&plantW2);
