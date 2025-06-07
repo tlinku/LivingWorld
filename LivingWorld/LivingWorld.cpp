@@ -1,92 +1,52 @@
 #include <iostream>
-#include "Position.h"
-#include "Organism.h"
-#include "Plant.h"
-#include "Animal.h"
-#include "World.h"
+#include "src/Abstractions/Position.h"
+#include "src/Abstractions/Organism.h"
+#include "src/Abstractions/Plant.h"
+#include "src/Abstractions/Animal.h"
+#include "src/World/World.h"
+#include "src/Organisms/Sheep.h"
+#include "src/Organisms/Wolf.h"
+#include "src/Organisms/Dandelion.h"
+#include "src/Organisms/Toadstool.h"
+#include <memory>
+#include <vector>
 
 using namespace std;
 
 int main()
 {
-	// Position 
-	Position p1;
-	Position p2{ 1, 1 };
-	Position p3{ -3, -5 };
+	World world(20, 20); // większa siatka
 
-	//cout << p1.toString() << endl;
-	//cout << p2.toString() << endl;
-	//cout << p3.toString() << endl;
-	//cout << p1.distance(p2) << endl;
-	//p2.move(4, 6);
-	//cout << p2.toString() << endl;
+	// Dodajemy kilka owiec
+	for (int i = 0; i < 6; ++i) {
+		world.addOrganism(std::make_unique<Sheep>(Position(2 + i, 2 + i)));
+	}
 
-	// Organism
-	//Organism org1;
-	//Organism org2{ 10, p2 };
+	// Dodajemy dwa wilki
+	world.addOrganism(std::make_unique<Wolf>(Position(10, 10)));
+	world.addOrganism(std::make_unique<Wolf>(Position(11, 10)));
 
-	//cout << org1.toString() << endl;
-	//cout << org2.toString() << endl;
-	//org1.move(2, 3);
-	//cout << org1.toString() << endl;
+	// Dodajemy kilka mniszków
+	for (int i = 0; i < 1; i++) {
+		world.addOrganism(std::make_unique<Dandelion>(Position(5 + i, 15 - i)));
+	}
 
-	// Plant & Animal
-	Plant plant{ 3, p3, {}, 0, 0 };
-	Animal animal{ 5, p2, {}, 0, 0 };
-	Plant plant2{ 0, Position(0,0), {}, 0, 0 };
-	Animal animal2{ 0, Position(0,0), {}, 0, 0 };
+	// Dodajemy jednego muchomora
+	world.addOrganism(std::make_unique<Toadstool>(Position(18, 18)));
 
-	cout << plant.toString() << endl;
-	cout << animal.toString() << endl;
-	cout << plant2.toString() << endl;
-	cout << animal2.toString() << endl;
-	plant.move(3, 4);
-	cout << plant.toString() << endl;
-	animal.move(1, 2);
-	cout << animal.toString() << endl;
-	
-	// World test
-	World world;
-	Position posP1{ 4, 5 };
-	Plant plantW1{ 3, posP1 };
-	Position posP2{ 5, 4 };
-	Plant plantW2{ 3, posP2};
-
-	Position posW2{ 3, 2 };
-	Animal animalW1{ 6, posW2, {}, 0, 0 };
-	Position posW3{ 2, 3 };
-	Animal animalW2{ 6, posW3, {}, 0, 0 };
-
-	world.addOrganism(&plantW1);
-	world.addOrganism(&plantW2);
-	world.addOrganism(&animalW1);
-	world.addOrganism(&animalW2);
-
-	auto positions = world.getVectorOfFreePositionsAround(Position(5, 5));
-
-	for(auto pos: positions)
-		cout << pos.toString() << endl;
-
-	// Tura 0
+	// Wyświetl stan świata
 	cout << world.toString() << endl;
 
-	// Tura 1
-	world.makeTurn();
-	cout << world.toString() << endl;
+	// Symulacja 20 tur
+	for (int t = 0; t < 20; ++t) {
+		world.makeTurn();
+		cout << "\nTura: " << (t + 1) << endl;
+		cout << world.toString() << endl;
+	}
 
-	// Tura 2
-	world.makeTurn();
-	cout << world.toString() << endl;
-
-	world.writeWorld("world.bin");
-
-	// Tura 3
-	world.makeTurn();
-	cout << world.toString() << endl;
-
-	// powrot do Tury 2
-	world.readWorld("world.bin");
-	cout << world.toString() << endl;
+	// Możesz dodać zapis/odczyt, itp.
+	// world.writeWorld("world.txt");
+	// world.readWorld("world.txt");
 
 	return 0;
 }
