@@ -24,5 +24,6 @@ public:
     void eat(Organism* other, int currentTurn, World* world) override;
     bool canReproduce() override;
     void reproduce() override;
+    int getPowerToReproduce() const { return powerToReproduce; }
 
 };

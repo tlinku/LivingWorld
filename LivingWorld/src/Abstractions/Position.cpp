@@ -44,3 +44,7 @@ double Position::distance(Position position)
 	double dy = (double)this->getY() - (double)position.getY();
 	return sqrt( (dx * dx) + (dy * dy) );
 }
+
+bool operator==(const Position& lhs, const Position& rhs) {
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}

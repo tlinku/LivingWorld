@@ -10,15 +10,14 @@ private:
     int worldX;
     int worldY;
     int turn = 0;
-    std::vector<std::unique_ptr<Organism>> organisms;
-    char separator = '.';
-    int nextOrganismId = 1; // licznik do nadawania unikalnych id
 
+    char separator = '.';
+    int nextOrganismId = 1;
+public:
     std::string getOrganismFromPosition(int x, int y);
     bool isPositionOnWorld(int x, int y);
     bool isPositionFree(Position position);
-
-public:
+    std::vector<std::unique_ptr<Organism>> organisms;
     World(int worldX, int worldY);
     World() : World(6, 6) {}
 
@@ -37,4 +36,5 @@ public:
     void readWorld(const std::string& fileName);
     std::string toString();
     std::vector<Organism*> getAllOrganisms() const;
+    std::string boardToString();
 };

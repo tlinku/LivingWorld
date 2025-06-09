@@ -44,6 +44,7 @@ void Animal::eat(Organism* other, int currentTurn, World* world) {
     }
 }
 
+
 bool Animal::canReproduce() {
     return getPower() >= powerToReproduce;
 }

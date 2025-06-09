@@ -10,9 +10,9 @@ Wolf::Wolf(Position position)
 {
     setSpecies("W");
     diet = {
-        {"Sheep", true},
-        {"Wolf", false},
-        {"Plant", false}
+        {"S", true},
+        {"W", false},
+        {"P", false}
     };
 }
 std::string Wolf::serialize() const {
@@ -52,7 +52,7 @@ std::unique_ptr<Wolf> Wolf::deserialize(const std::string& line) {
 }
 
 std::string Wolf::toString() const {
-    return "Wolf at (" + std::to_string(getPosition().getX()) + ", " + std::to_string(getPosition().getY()) + ")";
+    return "Wolf at (" + std::to_string(getPosition().getX()) + ", " + std::to_string(getPosition().getY()) + ") with power: " + std::to_string(getPower());
 }
 
 void Wolf::eat(Organism* other, int currentTurn, World* world) {
@@ -64,6 +64,5 @@ void Wolf::eat(Organism* other, int currentTurn, World* world) {
     if (dynamic_cast<Sheep*>(other) && canEat(other)) {
         setPower(getPower() + 1);
         Death::execute(other, currentTurn, world);
-        return;
     }
 }

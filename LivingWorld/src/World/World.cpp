@@ -1,4 +1,7 @@
 #include "World.h"
+#include "BoardRenderer.h"
+#include "MovementManager.h"
+#include "ReproductionManager.h"
 #include <fstream>
 #include <algorithm>
 #include <random>
@@ -9,7 +12,7 @@
 #include "../Organisms/Toadstool.h"
 #include "../Organisms/Dandelion.h"
 #include <set>
-#include <iostream>
+#include "iostream"
 
 std::string World::getOrganismFromPosition(int x, int y) {
     for (const auto& org : organisms) {
@@ -63,93 +66,17 @@ void World::removeOrganism(Organism* organism) {
 }
 
 void World::makeTurn() {
-    std::vector<Organism*> toDie;
+    std::set<Organism*> toDie;
     std::vector<std::unique_ptr<Organism>> toAdd;
 
-    for (auto& org : organisms) {
-        org->setPower(org->getPower()+1);
-        auto* animal = dynamic_cast<Animal*>(org.get());
-        if (animal) {
-            Organism* bestFood = nullptr;
-            int minDist = 1000000;
-            for (auto& other : organisms) {
-                if (other.get() != org.get() && animal->canEat(other.get())) {
-                    int dist = abs(other->getPosition().getX() - org->getPosition().getX()) + abs(other->getPosition().getY() - org->getPosition().getY());
-                    if (dist < minDist) {
-                        minDist = dist;
-                        bestFood = other.get();
-                    }
-                }
-            }
-            if (bestFood) {
-                int dx = (bestFood->getPosition().getX() > org->getPosition().getX()) ? 1 : (bestFood->getPosition().getX() < org->getPosition().getX() ? -1 : 0);
-                int dy = (bestFood->getPosition().getY() > org->getPosition().getY()) ? 1 : (bestFood->getPosition().getY() < org->getPosition().getY() ? -1 : 0);
-                Position newPos(org->getPosition().getX() + dx, org->getPosition().getY() + dy);
-                if (isPositionOnWorld(newPos.getX(), newPos.getY()) && isPositionFree(newPos)) {
-                    animal->move(dx, dy);
-                }
-                if (org->getPosition().getX() == bestFood->getPosition().getX() && org->getPosition().getY() == bestFood->getPosition().getY()) {
-                    animal->eat(bestFood, turn, this);
-                    toDie.push_back(bestFood);
-                }
-            } else {
-                std::vector<Position> freePositions = getVectorOfFreePositionsAround(org->getPosition());
-                if (!freePositions.empty()) {
-                    int idx = rand() % freePositions.size();
-                    animal->move(freePositions[idx].getX() - org->getPosition().getX(),
-                                 freePositions[idx].getY() - org->getPosition().getY());
-                }
-            }
-        }
-    }
-
-    std::set<Organism*> alreadyReproduced;
-    for (auto& org : organisms) {
-        auto* animal = dynamic_cast<Animal*>(org.get());
-        if (!animal || !animal->canReproduce() || alreadyReproduced.count(org.get())) continue;
-        for (auto& other : organisms) {
-            if (other.get() == org.get() || other->getSpecies() != org->getSpecies()) continue;
-            auto* partner = dynamic_cast<Animal*>(other.get());
-            if (!partner || !partner->canReproduce() || alreadyReproduced.count(other.get())) continue;
-            int dx = abs(org->getPosition().getX() - other->getPosition().getX());
-            int dy = abs(org->getPosition().getY() - other->getPosition().getY());
-            if ((dx == 1 && dy == 0) || (dx == 0 && dy == 1)) {
-                std::vector<Position> freePositions = getVectorOfFreePositionsAround(org->getPosition());
-                if (freePositions.empty()) continue;
-                int idx = rand() % freePositions.size();
-                if (org->getSpecies() == "S") {
-                    toAdd.push_back(std::make_unique<Sheep>(freePositions[idx]));
-                } else if (org->getSpecies() == "W") {
-                    toAdd.push_back(std::make_unique<Wolf>(freePositions[idx]));
-                }
-                animal->reproduce();
-                partner->reproduce();
-                alreadyReproduced.insert(org.get());
-                alreadyReproduced.insert(other.get());
-                break;
-            }
-        }
-    }
+    MovementManager::processMovements(*this, toDie);
+    ReproductionManager::processReproduction(*this, toDie, toAdd);
 
     for (auto& org : organisms) {
-        auto* plant = dynamic_cast<Plant*>(org.get());
-        if (plant && plant->canReproduce()) {
-            std::vector<Position> freePositions = getVectorOfFreePositionsAround(org->getPosition());
-            if (freePositions.empty()) continue;
-            int idx = rand() % freePositions.size();
-            if (org->getSpecies() == "D") {
-                toAdd.push_back(std::make_unique<Dandelion>(freePositions[idx]));
-            } else if (org->getSpecies() == "T") {
-                toAdd.push_back(std::make_unique<Toadstool>(freePositions[idx]));
-            }
-            org->reproduce();
-        }
-    }
-
-    for (auto& org : organisms) {
+        if (toDie.count(org.get())) continue;
         org->setLiveLength(org->getLiveLength() - 1);
         if (org->getLiveLength() == 0) {
-            toDie.push_back(org.get());
+            toDie.insert(org.get());
         }
     }
 
@@ -189,9 +116,9 @@ void World::readWorld(const std::string& fileName) {
             std::string type;
             iss >> type;
             std::unique_ptr<Organism> org;
-            if (type == "Sheep") org = Sheep::deserialize(line);
-            else if (type == "Wolf") org = Wolf::deserialize(line);
-            else if (type == "Toadstool") org = Toadstool::deserialize(line);
+            if (type == "S") org = Sheep::deserialize(line);
+            else if (type == "W") org = Wolf::deserialize(line);
+            else if (type == "T") org = Toadstool::deserialize(line);
             if (org) organisms.push_back(std::move(org));
         }
         my_file.close();
@@ -213,4 +140,8 @@ std::vector<Organism*> World::getAllOrganisms() const {
         result.push_back(org.get());
     }
     return result;
+}
+
+std::string World::boardToString() {
+    return BoardRenderer::render(*this);
 }

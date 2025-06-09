@@ -20,4 +20,6 @@ public:
 	string toString();
 
 	double distance(Position position);
+
+	friend bool operator==(const Position& lhs, const Position& rhs);
 };

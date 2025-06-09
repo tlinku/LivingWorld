@@ -9,9 +9,10 @@ Sheep::Sheep(Position position)
 {
     setSpecies("S");
     diet = {
-        {"Sheep", false},
-        {"Wolf", false},
-        {"Plant", true}
+        {"S", false},
+        {"W", false},
+        {"D", true},
+        {"T", true}
     };
 }
 
