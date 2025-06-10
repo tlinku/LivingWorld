@@ -49,11 +49,11 @@ World::World(int worldX, int worldY) {
     setWorldY(worldY);
 }
 
-int World::getWorldX() { return this->worldX; }
+int World::getWorldX() const { return this->worldX; }
 void World::setWorldX(int worldX) { this->worldX = worldX; }
-int World::getWorldY() { return this->worldY; }
+int World::getWorldY() const { return this->worldY; }
 void World::setWorldY(int worldY) { this->worldY = worldY; }
-int World::getTurn() { return this->turn; }
+int World::getTurn() const { return this->turn; }
 
 void World::addOrganism(std::unique_ptr<Organism> organism) {
     organism->setId(nextOrganismId++);
@@ -66,7 +66,8 @@ void World::removeOrganism(Organism* organism) {
 }
 
 void World::makeTurn() {
-    std::set<Organism*> toDie;
+    // Używamy publicznego pola toDie zamiast lokalnego
+    toDie.clear(); // Wyczyść poprzednie oznaczenia
     std::vector<std::unique_ptr<Organism>> toAdd;
 
     MovementManager::processMovements(*this, toDie);

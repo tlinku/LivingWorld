@@ -76,8 +76,23 @@ void MovementManager::processMovements(World& world, std::set<Organism*>& toDie)
                 int dx = (bestFood->getPosition().getX() > org->getPosition().getX()) ? 1 : (bestFood->getPosition().getX() < org->getPosition().getX() ? -1 : 0);
                 int dy = (bestFood->getPosition().getY() > org->getPosition().getY()) ? 1 : (bestFood->getPosition().getY() < org->getPosition().getY() ? -1 : 0);
                 Position newPos(org->getPosition().getX() + dx, org->getPosition().getY() + dy);
-                if (world.isPositionOnWorld(newPos.getX(), newPos.getY()) && world.isPositionFree(newPos)) {
-                    animal->move(dx, dy);
+                if (world.isPositionOnWorld(newPos.getX(), newPos.getY())) {
+                    Organism* occupant = nullptr;
+                    for (auto& other : organisms) {
+                        if (other.get() != org.get() && !toDie.count(other.get()) && other->getPosition() == newPos) {
+                            occupant = other.get();
+                            break;
+                        }
+                    }
+                    if (occupant == nullptr) {
+                        // Pole wolne
+                        animal->move(dx, dy);
+                    } else if (animal->canEat(occupant)) {
+                        // Pole zajęte przez jadalny organizm
+                        animal->move(dx, dy);
+                        animal->eat(occupant, turn, &world);
+                        toDie.insert(occupant);
+                    }
                 }
             } else {
                 std::vector<Position> freePositions = world.getVectorOfFreePositionsAround(org->getPosition());
@@ -91,4 +106,3 @@ void MovementManager::processMovements(World& world, std::set<Organism*>& toDie)
         orgIdx++;
     }
 }
-

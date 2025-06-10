@@ -1,11 +1,20 @@
 #include "Sheep.h"
-#include <sstream>
+#include "sstream"
 #include "../World/World.h"
-#include "Toadstool.h"
-#include "../Abstractions/Death.h"
 
 Sheep::Sheep(Position position)
-    : Animal(3, position, {}, 3, 10, 6)
+    : Animal(3, position, {}, 5, 12, 6)
+{
+    setSpecies("S");
+    diet = {
+        {"S", false},
+        {"W", false},
+        {"D", true},
+        {"T", true}
+    };
+}
+Sheep::Sheep(Position position, std::vector<std::pair<int, int>> ancestryHistory)
+    : Animal(3, position, ancestryHistory, 5, 12, 6)
 {
     setSpecies("S");
     diet = {
@@ -54,16 +63,4 @@ std::unique_ptr<Sheep> Sheep::deserialize(const std::string& line) {
 
 std::string Sheep::toString() const {
     return "Sheep at (" + std::to_string(getPosition().getX()) + ", " + std::to_string(getPosition().getY()) + ") with power: " + std::to_string(getPower());
-}
-
-void Sheep::eat(Organism* other, int currentTurn, World* world) {
-    if (!other || !world) return;
-    if (dynamic_cast<Toadstool*>(other)) {
-        static_cast<Toadstool*>(other)->onEatenBy(this, currentTurn, world);
-        return;
-    }
-    if (canEat(other)) {
-        setPower(getPower() + 1);
-        Death::execute(other, currentTurn, world);
-    }
 }

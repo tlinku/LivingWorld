@@ -11,9 +11,11 @@ Toadstool::Toadstool(Position position)
 }
 void Toadstool::onEatenBy(Organism* eater, int currentTurn, World* world) {
     if (eater && world) {
-        Death::execute(eater, currentTurn, world);
+        world->toDie.insert(eater);
     }
-    Death::execute(this, currentTurn, world);
+    if (world) {
+        world->toDie.insert(this);
+    }
 }
 std::unique_ptr<Toadstool> Toadstool::deserialize(const std::string& line) {
     std::istringstream iss(line);

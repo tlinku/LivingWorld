@@ -12,9 +12,22 @@ Wolf::Wolf(Position position)
     diet = {
         {"S", true},
         {"W", false},
-        {"P", false}
+        {"D", false},
+        {"T", true}
     };
 }
+Wolf::Wolf(Position position, std::vector<std::pair<int, int>> ancestryHistory)
+    : Animal(8, position, ancestryHistory, 5, 15, 12)
+{
+    setSpecies("W");
+    diet = {
+        {"S", true},
+        {"W", false},
+        {"D", true},
+        {"T", true}
+    };
+}
+
 std::string Wolf::serialize() const {
     std::ostringstream oss;
     oss << "Wolf "
@@ -55,14 +68,3 @@ std::string Wolf::toString() const {
     return "Wolf at (" + std::to_string(getPosition().getX()) + ", " + std::to_string(getPosition().getY()) + ") with power: " + std::to_string(getPower());
 }
 
-void Wolf::eat(Organism* other, int currentTurn, World* world) {
-    if (!other || !world) return;
-    if (dynamic_cast<Toadstool*>(other)) {
-        static_cast<Toadstool*>(other)->onEatenBy(this, currentTurn, world);
-        return;
-    }
-    if (dynamic_cast<Sheep*>(other) && canEat(other)) {
-        setPower(getPower() + 1);
-        Death::execute(other, currentTurn, world);
-    }
-}

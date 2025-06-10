@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <set>
 #include "../Abstractions/Organism.h"
 
 class World {
@@ -14,6 +15,7 @@ private:
     char separator = '.';
     int nextOrganismId = 1;
 public:
+    std::set<Organism*> toDie;
     std::string getOrganismFromPosition(int x, int y);
     bool isPositionOnWorld(int x, int y);
     bool isPositionFree(Position position);
@@ -21,11 +23,11 @@ public:
     World(int worldX, int worldY);
     World() : World(6, 6) {}
 
-    int getWorldX();
+    int getWorldX() const;
     void setWorldX(int worldX);
-    int getWorldY();
+    int getWorldY() const;
     void setWorldY(int worldY);
-    int getTurn();
+    int getTurn() const;
 
     void addOrganism(std::unique_ptr<Organism> organism);
     void removeOrganism(Organism* organism);

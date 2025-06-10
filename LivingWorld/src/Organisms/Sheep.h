@@ -8,14 +8,11 @@ using namespace std;
 
 class Sheep : public Animal
 {
-	protected:
-		std::unordered_map<std::string, bool> diet;
 	public:
 		Sheep(Position position);
+		Sheep(Position position, std::vector<std::pair<int, int>> ancestryHistory);
 		~Sheep() override = default;
 		std::string serialize() const override;
 		static std::unique_ptr<Sheep> deserialize(const std::string& line);
 		std::string toString() const override;
-		void eat(Organism* other, int currentTurn, World* world) override;
-
 };

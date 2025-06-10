@@ -10,7 +10,6 @@
 void ReproductionManager::processReproduction(World& world, std::set<Organism*>& toDie, std::vector<std::unique_ptr<Organism>>& toAdd) {
     auto& organisms = world.organisms; // zakładamy, że organisms jest publiczny lub udostępniony przez getter
     std::set<Organism*> alreadyReproduced;
-    // Zwierzęta
     for (auto& org : organisms) {
         if (toDie.count(org.get())) continue;
         auto* animal = dynamic_cast<Animal*>(org.get());
@@ -25,10 +24,12 @@ void ReproductionManager::processReproduction(World& world, std::set<Organism*>&
                 std::vector<Position> freePositions = world.getVectorOfFreePositionsAround(org->getPosition());
                 if (freePositions.empty()) continue;
                 int idx = rand() % freePositions.size();
+                std::vector<std::pair<int, int>> childHistory = animal->getAncestryHistory();
+                childHistory.emplace_back(org->getId(), world.getTurn());
                 if (org->getSpecies() == "S") {
-                    toAdd.push_back(std::make_unique<Sheep>(freePositions[idx]));
+                    toAdd.push_back(std::make_unique<Sheep>(freePositions[idx], childHistory));
                 } else if (org->getSpecies() == "W") {
-                    toAdd.push_back(std::make_unique<Wolf>(freePositions[idx]));
+                    toAdd.push_back(std::make_unique<Wolf>(freePositions[idx], childHistory));
                 }
                 animal->reproduce();
                 partner->reproduce();
@@ -38,7 +39,16 @@ void ReproductionManager::processReproduction(World& world, std::set<Organism*>&
             }
         }
     }
-    // Rośliny
+    int dandelionCount = 0;
+    int toadstoolCount = 0;
+    for (auto& org : organisms) {
+        if (toDie.count(org.get())) continue;
+        auto* plant = dynamic_cast<Plant*>(org.get());
+        if (plant && plant->canReproduce()) {
+            if (org->getSpecies() == "D") dandelionCount++;
+            if (org->getSpecies() == "T") toadstoolCount++;
+        }
+    }
     for (auto& org : organisms) {
         if (toDie.count(org.get())) continue;
         auto* plant = dynamic_cast<Plant*>(org.get());
@@ -46,13 +56,14 @@ void ReproductionManager::processReproduction(World& world, std::set<Organism*>&
             std::vector<Position> freePositions = world.getVectorOfFreePositionsAround(org->getPosition());
             if (freePositions.empty()) continue;
             int idx = rand() % freePositions.size();
-            if (org->getSpecies() == "D") {
+            if (org->getSpecies() == "D" && dandelionCount < 20) {
                 toAdd.push_back(std::make_unique<Dandelion>(freePositions[idx]));
-            } else if (org->getSpecies() == "T") {
+                dandelionCount++;
+            } else if (org->getSpecies() == "T" && toadstoolCount < 10) {
                 toAdd.push_back(std::make_unique<Toadstool>(freePositions[idx]));
+                toadstoolCount++;
             }
             org->reproduce();
         }
     }
 }
-

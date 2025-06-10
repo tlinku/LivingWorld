@@ -6,6 +6,12 @@ Dandelion::Dandelion(Position position)
     setSpecies("D");
 }
 
+Dandelion::Dandelion(Position position, std::vector<std::pair<int, int>> ancestryHistory)
+    : Plant(2, position, ancestryHistory, 0, 8, 0)
+{
+    setSpecies("D");
+}
+
 std::string Dandelion::serialize() const {
     std::ostringstream oss;
     oss << "Dandelion "

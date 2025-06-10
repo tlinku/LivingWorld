@@ -2,16 +2,12 @@
 
 #include "Death.h"
 #include "../World/World.h"
+#include "../Organisms/Toadstool.h"
 
 Animal::Animal(int power, Position position, vector<pair<int, int>> ancestryHistory, int initiative, int liveLength, int powerToReproduce)
     : Organism(power, position, ancestryHistory, initiative, liveLength, powerToReproduce), lastPosition(position)
 {
     setSpecies("A");
-    diet = {
-        {"Sheep", false},
-        {"Wolf", false},
-        {"Plant", false}
-    };
 }
 
 Position Animal::getLastPosition() const {
@@ -38,7 +34,12 @@ bool Animal::canEat(Organism* other) {
 }
 
 void Animal::eat(Organism* other, int currentTurn, World* world) {
-    if (canEat(other) && world) {
+    if (!other || !world) return;
+    if (auto* toadstool = dynamic_cast<Toadstool*>(other)) {
+        toadstool->onEatenBy(this, currentTurn, world);
+        return;
+    }
+    if (canEat(other)) {
         setPower(getPower() + 1);
         Death::execute(other, currentTurn, world);
     }
