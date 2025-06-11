@@ -57,6 +57,9 @@ int World::getTurn() const { return this->turn; }
 
 void World::addOrganism(std::unique_ptr<Organism> organism) {
     organism->setId(nextOrganismId++);
+    if (organism->getBirthTurn() == -1) {
+        organism->setBirthTurn(turn);
+    }
     organisms.push_back(std::move(organism));
 }
 
@@ -66,8 +69,7 @@ void World::removeOrganism(Organism* organism) {
 }
 
 void World::makeTurn() {
-    // Używamy publicznego pola toDie zamiast lokalnego
-    toDie.clear(); // Wyczyść poprzednie oznaczenia
+    toDie.clear(); 
     std::vector<std::unique_ptr<Organism>> toAdd;
 
     MovementManager::processMovements(*this, toDie);
