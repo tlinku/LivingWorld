@@ -8,7 +8,7 @@
 #include <set>
 
 void ReproductionManager::processReproduction(World& world, std::set<Organism*>& toDie, std::vector<std::unique_ptr<Organism>>& toAdd) {
-    auto& organisms = world.organisms; // zakładamy, że organisms jest publiczny lub udostępniony przez getter
+    auto& organisms = world.organisms; 
     std::set<Organism*> alreadyReproduced;
     for (auto& org : organisms) {
         if (toDie.count(org.get())) continue;
@@ -25,11 +25,17 @@ void ReproductionManager::processReproduction(World& world, std::set<Organism*>&
                 if (freePositions.empty()) continue;
                 int idx = rand() % freePositions.size();
                 std::vector<std::pair<int, int>> childHistory = animal->getAncestryHistory();
-                childHistory.emplace_back(org->getId(), world.getTurn());
+                childHistory.emplace_back(org->getBirthTurn(), -1);
                 if (org->getSpecies() == "S") {
-                    toAdd.push_back(std::make_unique<Sheep>(freePositions[idx], childHistory));
+                    auto child = std::make_unique<Sheep>(freePositions[idx], childHistory);
+                    child->setParentId(org->getId());
+                    child->setBirthTurn(world.getTurn());
+                    toAdd.push_back(std::move(child));
                 } else if (org->getSpecies() == "W") {
-                    toAdd.push_back(std::make_unique<Wolf>(freePositions[idx], childHistory));
+                    auto child = std::make_unique<Wolf>(freePositions[idx], childHistory);
+                    child->setParentId(org->getId());
+                    child->setBirthTurn(world.getTurn());
+                    toAdd.push_back(std::move(child));
                 }
                 animal->reproduce();
                 partner->reproduce();
@@ -56,11 +62,19 @@ void ReproductionManager::processReproduction(World& world, std::set<Organism*>&
             std::vector<Position> freePositions = world.getVectorOfFreePositionsAround(org->getPosition());
             if (freePositions.empty()) continue;
             int idx = rand() % freePositions.size();
+            std::vector<std::pair<int, int>> childHistory = org->getAncestryHistory();
+            childHistory.emplace_back(org->getBirthTurn(), -1);
             if (org->getSpecies() == "D" && dandelionCount < 20) {
-                toAdd.push_back(std::make_unique<Dandelion>(freePositions[idx]));
+                auto child = std::make_unique<Dandelion>(freePositions[idx], childHistory);
+                child->setParentId(org->getId());
+                child->setBirthTurn(world.getTurn());
+                toAdd.push_back(std::move(child));
                 dandelionCount++;
             } else if (org->getSpecies() == "T" && toadstoolCount < 10) {
-                toAdd.push_back(std::make_unique<Toadstool>(freePositions[idx]));
+                auto child = std::make_unique<Toadstool>(freePositions[idx], childHistory);
+                child->setParentId(org->getId());
+                child->setBirthTurn(world.getTurn());
+                toAdd.push_back(std::move(child));
                 toadstoolCount++;
             }
             org->reproduce();

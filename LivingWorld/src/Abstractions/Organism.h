@@ -20,6 +20,8 @@ protected:
 
 protected:
     int id = -1;
+    int parentId = -1;
+    int birthTurn = -1;
 
 public:
 	virtual ~Organism() = default;
@@ -52,6 +54,10 @@ public:
 
     int getId() const;
     void setId(int newId);
+    int getParentId() const;
+    void setParentId(int newParentId);
+    int getBirthTurn() const;
+    void setBirthTurn(int newBirthTurn);
 
 	virtual std::string toString() const = 0;
     virtual bool canReproduce() const { return false; }

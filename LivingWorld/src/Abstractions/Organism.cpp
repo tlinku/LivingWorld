@@ -20,7 +20,10 @@ Organism::Organism(const Organism& other)
       initiative(other.initiative),
       liveLength(other.liveLength),
       powerToReproduce(other.powerToReproduce),
-      sign(other.sign) {}
+      sign(other.sign),
+      id(other.id),
+      parentId(other.parentId),
+      birthTurn(other.birthTurn) {}
 
 Organism::Organism(Organism&& other) noexcept
     : power(other.power),
@@ -30,7 +33,10 @@ Organism::Organism(Organism&& other) noexcept
       initiative(other.initiative),
       liveLength(other.liveLength),
       powerToReproduce(other.powerToReproduce),
-      sign(std::move(other.sign)) {}
+      sign(std::move(other.sign)),
+      id(other.id),
+      parentId(other.parentId),
+      birthTurn(other.birthTurn) {}
 
 Organism& Organism::operator=(const Organism& other) {
     if (this != &other) {
@@ -42,6 +48,9 @@ Organism& Organism::operator=(const Organism& other) {
         liveLength = other.liveLength;
         powerToReproduce = other.powerToReproduce;
         sign = other.sign;
+        id = other.id;
+        parentId = other.parentId;
+        birthTurn = other.birthTurn;
     }
     return *this;
 }
@@ -56,6 +65,9 @@ Organism& Organism::operator=(Organism&& other) noexcept {
         liveLength = other.liveLength;
         powerToReproduce = other.powerToReproduce;
         sign = std::move(other.sign);
+        id = other.id;
+        parentId = other.parentId;
+        birthTurn = other.birthTurn;
     }
     return *this;
 }
@@ -118,4 +130,20 @@ int Organism::getId() const {
 
 void Organism::setId(int newId) {
     id = newId;
+}
+
+int Organism::getParentId() const {
+    return parentId;
+}
+
+void Organism::setParentId(int newParentId) {
+    parentId = newParentId;
+}
+
+int Organism::getBirthTurn() const {
+    return birthTurn;
+}
+
+void Organism::setBirthTurn(int newBirthTurn) {
+    birthTurn = newBirthTurn;
 }

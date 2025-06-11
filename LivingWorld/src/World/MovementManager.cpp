@@ -3,7 +3,7 @@
 #include "../Abstractions/Plant.h"
 
 void MovementManager::processMovements(World& world, std::set<Organism*>& toDie) {
-    auto& organisms = world.organisms; // zakładamy, że organisms jest publiczny lub udostępniony przez getter
+    auto& organisms = world.organisms; 
     int turn = world.getTurn();
     int orgIdx = 0;
     for (auto& org : organisms) {
@@ -85,10 +85,8 @@ void MovementManager::processMovements(World& world, std::set<Organism*>& toDie)
                         }
                     }
                     if (occupant == nullptr) {
-                        // Pole wolne
                         animal->move(dx, dy);
                     } else if (animal->canEat(occupant)) {
-                        // Pole zajęte przez jadalny organizm
                         animal->move(dx, dy);
                         animal->eat(occupant, turn, &world);
                         toDie.insert(occupant);

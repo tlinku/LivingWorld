@@ -5,38 +5,48 @@
 #include "src/Organisms/Wolf.h"
 #include "src/Organisms/Dandelion.h"
 #include "src/Organisms/Toadstool.h"
+#include "src/World/WorldWindow.h"
 #include <memory>
 
 using namespace std;
 
 int main()
 {
-	World world(20, 20);
+    World world(30, 20); // większa mapa
 
-	for (int i = 0; i < 6; ++i) {
-		world.addOrganism(std::make_unique<Sheep>(Position(2 + i, 2 + i)));
-	}
+    // Dodajemy "trawę" (Dandelion) w skupisku
+    for (int i = 5; i < 10; ++i) {
+        for (int j = 5; j < 8; ++j) {
+            world.addOrganism(std::make_unique<Dandelion>(Position(i, j)));
+        }
+    }
 
-	world.addOrganism(std::make_unique<Wolf>(Position(10, 10)));
-	world.addOrganism(std::make_unique<Wolf>(Position(11, 10)));
+    // Dodajemy owce blisko trawy
+    world.addOrganism(std::make_unique<Sheep>(Position(6, 4)));
+    world.addOrganism(std::make_unique<Sheep>(Position(7, 4)));
+    world.addOrganism(std::make_unique<Sheep>(Position(8, 4)));
+    world.addOrganism(std::make_unique<Sheep>(Position(5, 8)));
+    world.addOrganism(std::make_unique<Sheep>(Position(9, 7)));
+    world.addOrganism(std::make_unique<Sheep>(Position(8, 8)));
 
-	for (int i = 0; i < 1; i++) {
-		world.addOrganism(std::make_unique<Dandelion>(Position(5 + i, 15 - i)));
-	}
+    // Dodajemy wilki daleko od owiec, ale w zasięgu dojścia
+    world.addOrganism(std::make_unique<Wolf>(Position(25, 15)));
+    world.addOrganism(std::make_unique<Wolf>(Position(22, 18)));
+    world.addOrganism(std::make_unique<Wolf>(Position(28, 10)));
 
-	world.addOrganism(std::make_unique<Toadstool>(Position(18, 18)));
+    // Dodajemy muchomory między trawą
+    world.addOrganism(std::make_unique<Toadstool>(Position(7, 6)));
+    world.addOrganism(std::make_unique<Toadstool>(Position(8, 5)));
 
-	cout << world.toString() << endl;
+    // Dodajemy pojedyncze trawy w innych miejscach
+    world.addOrganism(std::make_unique<Dandelion>(Position(15, 2)));
+    world.addOrganism(std::make_unique<Dandelion>(Position(20, 10)));
 
-	for (int t = 0; t < 20; ++t) {
-		world.makeTurn();
-		cout << "\nTura: " << (t + 1) << endl;
-		cout << world.boardToString() << endl;
-		cout << world.toString() << endl;
-	}
+    // Dodajemy owcę "zagubioną" daleko od trawy
+    world.addOrganism(std::make_unique<Sheep>(Position(2, 17)));
 
-	// world.writeWorld("world.txt");
-	// world.readWorld("world.txt");
+    WorldWindow window(960, 640); // większe okno
+    window.run(world);
 
-	return 0;
+    return 0;
 }

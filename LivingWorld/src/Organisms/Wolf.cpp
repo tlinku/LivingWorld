@@ -35,7 +35,9 @@ std::string Wolf::serialize() const {
         << getPosition().getX() << ' ' << getPosition().getY() << ' '
         << getInitiative() << ' '
         << getLiveLength() << ' '
-        << powerToReproduce << ' ';
+        << powerToReproduce << ' '
+        << getParentId() << ' '
+        << getBirthTurn() << ' ';
     const auto& history = getAncestryHistory();
     oss << history.size();
     for (const auto& entry : history) {
@@ -47,8 +49,8 @@ std::string Wolf::serialize() const {
 std::unique_ptr<Wolf> Wolf::deserialize(const std::string& line) {
     std::istringstream iss(line);
     std::string type;
-    int power, x, y, initiative, liveLength, powerToReproduce, historySize;
-    iss >> type >> power >> x >> y >> initiative >> liveLength >> powerToReproduce >> historySize;
+    int power, x, y, initiative, liveLength, powerToReproduce, parentId, birthTurn, historySize;
+    iss >> type >> power >> x >> y >> initiative >> liveLength >> powerToReproduce >> parentId >> birthTurn >> historySize;
     std::vector<std::pair<int, int>> ancestryHistory;
     for (int i = 0; i < historySize; ++i) {
         int birth, death;
@@ -60,6 +62,8 @@ std::unique_ptr<Wolf> Wolf::deserialize(const std::string& line) {
     wolf->setInitiative(initiative);
     wolf->setLiveLength(liveLength);
     wolf->powerToReproduce = powerToReproduce;
+    wolf->setParentId(parentId);
+    wolf->setBirthTurn(birthTurn);
     wolf->setAncestryHistory(ancestryHistory);
     return wolf;
 }
