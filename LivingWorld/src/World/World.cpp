@@ -2,6 +2,7 @@
 #include "BoardRenderer.h"
 #include "MovementManager.h"
 #include "ReproductionManager.h"
+#include "../Abstractions/Death.h"
 #include <fstream>
 #include <algorithm>
 #include <random>
@@ -84,6 +85,7 @@ void World::makeTurn() {
     }
 
     for (Organism* org : toDie) {
+        Death::execute(org, turn, this);
         removeOrganism(org);
     }
     for (auto& org : toAdd) {
